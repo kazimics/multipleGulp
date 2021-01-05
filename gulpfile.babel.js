@@ -20,6 +20,7 @@ gulp.task('html', async () => {
     .pipe(gulp.dest('dist/'))
     .pipe(connect.reload())
 })
+
 // pug 模板语法
 gulp.task('pug', async () => {
   const pug = require('gulp-pug')
@@ -34,7 +35,6 @@ gulp.task('pug', async () => {
 
 // 整理 CSS 文件 
 gulp.task('css', async () => {
-
   const postcss = require('gulp-postcss')
   const precss = require('precss')
   const autoprefixer = require('autoprefixer')
@@ -49,9 +49,16 @@ gulp.task('css', async () => {
       ]))
     // 剔除未使用到的 css
     .pipe(purgecss({
-      content: ['src/*.html']
+      content: ['dist/*.html']
     }))
     .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest('dist/css'))
+    .pipe(connect.reload())
+})
+
+// css 库直接移动位置
+gulp.task('csslib', async () => {
+  return gulp.src('src/csslib/*.css')
     .pipe(gulp.dest('dist/css'))
     .pipe(connect.reload())
 })
@@ -70,6 +77,23 @@ gulp.task('js', async () => {
     .pipe(gulp.dest('dist/js'))
     .pipe(connect.reload())
 })
+
+gulp.task('ts', async () => {
+
+  const babel = require('gulp-babel')
+  const ts = require("gulp-typescript");
+  const tsProject = ts.createProject("tsconfig.json");
+
+  return gulp.src('src/js/*.ts')
+    .pipe(tsProject())
+    // 编译 es6
+    .pipe(babel({
+      presets: ["@babel/preset-env"]
+    }))
+    .pipe(gulp.dest('dist/js'))
+    .pipe(connect.reload())
+})
+
 // js 库直接移动位置
 gulp.task('jslib', async () => {
   return gulp.src('src/jslib/*.js')
@@ -104,14 +128,15 @@ gulp.task('watch', async () => {
     第一个参数： 文件监听的路径
     第二个参数： 去执行的任务
   */
-  gulp.watch('src/*.html', gulp.series('html'))
-  gulp.watch('src/css/*.css', gulp.series('css'))
-  gulp.watch('src/js/*.js', gulp.series('js'))
-  gulp.watch('src/jslib/*.js', gulp.series('jslib'))
-  gulp.watch('src/images/**/*', gulp.series('images'))
-  gulp.watch('src/data/**/*', gulp.series('data'))
-  gulp.watch('src/fonts/**/*', gulp.series('fonts'))
-  gulp.watch('src/**/*.pug', gulp.series('pug'))
+  gulp.watch('src/*.html', { events: ['all'] }, gulp.series('html'))
+  gulp.watch('src/css/*.css', { events: ['all'] }, gulp.series('css'))
+  gulp.watch('src/js/*.js', { events: ['all'] }, gulp.series('js'))
+  gulp.watch('src/jslib/*.js', { events: ['all'] }, gulp.series('jslib'))
+  gulp.watch('src/images/**/*', { events: ['all'] }, gulp.series('images'))
+  gulp.watch('src/data/**/*', { events: ['all'] }, gulp.series('data'))
+  gulp.watch('src/fonts/**/*', { events: ['all'] }, gulp.series('fonts'))
+  gulp.watch('src/**/*.pug', { events: ['all'] }, gulp.series('pug'))
+  gulp.watch('src/csslib/*.css', { events: ['all'] }, gulp.series('csslib'))
 })
 
 // 启动服务器
