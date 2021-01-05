@@ -20,6 +20,17 @@ gulp.task('html', async () => {
     .pipe(gulp.dest('dist/'))
     .pipe(connect.reload())
 })
+// pug 模板语法
+gulp.task('pug', async () => {
+  const pug = require('gulp-pug')
+  return gulp.src('src/*.pug')
+    .pipe(pug({
+      // Your options in here.
+      pretty: true,
+    }))
+    .pipe(gulp.dest('dist/'))
+    .pipe(connect.reload())
+})
 
 // 整理 CSS 文件 
 gulp.task('css', async () => {
@@ -93,17 +104,18 @@ gulp.task('watch', async () => {
     第一个参数： 文件监听的路径
     第二个参数： 去执行的任务
   */
-  gulp.watch('src/*.html',gulp.series('html'))
-  gulp.watch('src/css/*.css',gulp.series('css'))
-  gulp.watch('src/js/*.js',gulp.series('js'))
-  gulp.watch('src/jslib/*.js',gulp.series('jslib'))
-  gulp.watch('src/images/**/*',gulp.series('images'))
-  gulp.watch('src/data/**/*',gulp.series('data'))
-  gulp.watch('src/fonts/**/*',gulp.series('fonts'))
+  gulp.watch('src/*.html', gulp.series('html'))
+  gulp.watch('src/css/*.css', gulp.series('css'))
+  gulp.watch('src/js/*.js', gulp.series('js'))
+  gulp.watch('src/jslib/*.js', gulp.series('jslib'))
+  gulp.watch('src/images/**/*', gulp.series('images'))
+  gulp.watch('src/data/**/*', gulp.series('data'))
+  gulp.watch('src/fonts/**/*', gulp.series('fonts'))
+  gulp.watch('src/**/*.pug', gulp.series('pug'))
 })
 
 // 启动服务器
-gulp.task('server', async()=>{
+gulp.task('server', async () => {
   connect.server({
     root: 'dist',
     port: 8888,
@@ -112,4 +124,4 @@ gulp.task('server', async()=>{
 })
 
 // 同时启动监听和服务器
-gulp.task('default',gulp.parallel(['watch','server']))
+gulp.task('default', gulp.parallel(['watch', 'server']))
