@@ -1,6 +1,7 @@
 const gulp = require('gulp')
 const sourcemaps = require('gulp-sourcemaps')
 const connect = require('gulp-connect')
+const del = require('del')
 
 // 编写第一个任务
 /* 
@@ -122,6 +123,11 @@ gulp.task('fonts', async () => {
     .pipe(connect.reload())
 })
 
+// clean dist
+gulp.task('cleanDist', () => {
+  return del('dist/')
+})
+
 // 监听
 gulp.task('watch', async () => {
   /* 
@@ -131,6 +137,7 @@ gulp.task('watch', async () => {
   gulp.watch('src/*.html', { events: ['all'] }, gulp.series('html'))
   gulp.watch('src/css/*.css', { events: ['all'] }, gulp.series('css'))
   gulp.watch('src/js/*.js', { events: ['all'] }, gulp.series('js'))
+  gulp.watch('src/js/*.ts', { events: ['all'] }, gulp.series('ts'))
   gulp.watch('src/jslib/*.js', { events: ['all'] }, gulp.series('jslib'))
   gulp.watch('src/images/**/*', { events: ['all'] }, gulp.series('images'))
   gulp.watch('src/data/**/*', { events: ['all'] }, gulp.series('data'))
@@ -149,4 +156,6 @@ gulp.task('server', async () => {
 })
 
 // 同时启动监听和服务器
-gulp.task('default', gulp.parallel(['watch', 'server']))
+gulp.task('default',
+  gulp.series('cleanDist', gulp.parallel(['html', 'pug', 'css', 'csslib', 'js', 'ts', 'jslib', 'images', 'data', 'fonts', 'watch', 'server']))
+)
